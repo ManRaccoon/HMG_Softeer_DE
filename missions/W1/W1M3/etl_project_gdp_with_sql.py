@@ -19,11 +19,11 @@ def main():
 
     # LOAD 과정 진행
     log.message("Start LOAD step")
-    etl_load.load_GDP(config.LOAD_JSON_PATH, df)
-    log.message("Finish LOAD step: Data inserted into JSON file")
+    etl_load.load_GDP_db(config.LOAD_DB_PATH, df)
+    log.message("Finish LOAD step: Data inserted into DB")
 
-    etl_analysis.gdp_over_100b(config.LOAD_JSON_PATH)
-    etl_analysis.gdp_region_avg(config.LOAD_JSON_PATH)
+    etl_analysis.gdp_over_100b_db(config.LOAD_DB_PATH)
+    etl_analysis.gdp_region_avg_db(config.LOAD_DB_PATH)
 
 if __name__ == "__main__":
     main()

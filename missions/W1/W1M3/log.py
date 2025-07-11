@@ -1,6 +1,7 @@
 import logging
 import datetime as dt
 
+# 로깅 기본설정
 logging.basicConfig(
     filename = 'etl_project_log.txt',
     format = '%(message)s',
@@ -9,10 +10,7 @@ logging.basicConfig(
 
 logger = logging.getLogger()
 
-def start(work):
+# 메세지 형식 지정하여 로깅 진행 함수
+def message(msg):
     logtime = dt.datetime.now().strftime("%Y-%B-%d-%H-%M-%S")
-    logger.info(f'{logtime}, {work} 시작')
-
-def end(work):
-    logtime = dt.datetime.now().strftime("%Y-%B-%d-%H-%M-%S")
-    logger.info(f'{logtime}, {work} 종료')
+    logger.info(f'{logtime}, {msg}')
