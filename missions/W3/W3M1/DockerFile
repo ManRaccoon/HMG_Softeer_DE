@@ -1,22 +1,40 @@
-FROM ubuntu:20.04
+# # Ubuntu 베이스 이미지 설정
+# FROM ubuntu:20.04
 
-ENV HADOOP_VERSION=3.3.5
-ENV HADOOP_HOME=/usr/local/hadoop
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+# # 환경 변수 설정
+# ENV HADOOP_VERSION=3.3.6
+# ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64
+# ENV HADOOP_HOME=/usr/local/hadoop
+# ENV PATH=$PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 
-RUN apt-get update && \
-    apt-get install -y openjdk-8-jdk curl rsync && \
-    apt-get clean
+# # 하둡 실행을 위한 소프트웨어 다운로드
+# RUN apt-get update && \
+#     apt-get install -y openjdk-8-jdk curl rsync && \
+#     apt-get install -y ssh && \
+#     apt-get install -y pdsh && \
+#     apt-get clean
 
-RUN curl -O https://downloads.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
-    tar -xzvf hadoop-$HADOOP_VERSION.tar.gz && \
-    mv hadoop-$HADOOP_VERSION /usr/local/hadoop && \
-    rm hadoop-$HADOOP_VERSION.tar.gz
+# # 패스워드 입력 없는 SSh 로그인
+# RUN ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && \
+#     cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
-COPY core-site.xml $HADOOP_HOME/etc/hadoop/core-site.xml
-COPY hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml
+# # 하둡 다운로드
+# RUN curl -O https://downloads.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
+#     tar -xzvf hadoop-$HADOOP_VERSION.tar.gz && \
+#     mkdir -p /usr/local/hadoop && \
+#     mv hadoop-$HADOOP_VERSION ${HADOOP_HOME} && \
+#     rm hadoop-$HADOOP_VERSION.tar.gz
 
-EXPOSE 9870 9864 8088 9000
+# WORKDIR ${HADOOP_HOME}
 
-CMD ["/bin/bash"]
+# # 환경변수 다운로드
+# COPY core-site.xml $HADOOP_HOME/core-site.xml
+# COPY hdfs-site.xml $HADOOP_HOME/hdfs-site.xml
+# COPY mapred-site.xml $HADOOP_HOME/mapred-site.xml
+
+# EXPOSE 9870 9864 8088 9000
+
+# CMD ["bash", "-c", "service ssh start && \
+# hdfs namenode -format -force && \
+# start-dfs.sh && start-yarn.sh && \
+# tail -f /dev/null"]
