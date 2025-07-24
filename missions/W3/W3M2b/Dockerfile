@@ -1,7 +1,7 @@
 # Ubuntu 베이스 이미지 설정
 FROM ubuntu:20.04
 
-# 변수 설정
+# 환경 변수 설정
 ENV HADOOP_VERSION=3.3.6
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64
 ENV HADOOP_HOME=/usr/local/hadoop-$HADOOP_VERSION
@@ -12,6 +12,7 @@ ENV HDFS_DATANODE_USER=root \
     YARN_RESOURCEMANAGER_USER=root \
     YARN_NODEMANAGER_USER=root
 
+# 하둡 실행을 위한 소프트웨어 다운로드
 # 필수 패키지 설치 및 sshd 준비
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y --no-install-recommends \
@@ -36,7 +37,7 @@ RUN curl -O https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/
 
 WORKDIR ${HADOOP_HOME}
 
-# 설정파일 복사
+# 환경변수 다운로드
 COPY core-site.xml $HADOOP_HOME/etc/hadoop/core-site.xml
 COPY hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 COPY mapred-site.xml $HADOOP_HOME/etc/hadoop/mapred-site.xml
