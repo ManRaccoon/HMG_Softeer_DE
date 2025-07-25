@@ -56,7 +56,9 @@
 
 #!/bin/bash
 set -e
+export PDSH_RCMD_TYPE=ssh
 service ssh start
+
 ROLE=${HADOOP_ROLE}
 if [[ "$ROLE" == "master" ]]; then
   # NameNode 포맷 & 기동
