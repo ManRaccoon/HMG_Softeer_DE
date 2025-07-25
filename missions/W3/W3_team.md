@@ -4,7 +4,6 @@
 모든 Hadoop 컴포넌트에서 공통으로 참조하는 기본 설정을 담당하는 파일이다.
 
 - fs.defaultFS : file system URI를 명시하는 파라미터. Hadoop은 여러 종류의 파일 시스템을 지원하기에, 어디서 데이터를 읽고 쓸 것인지 명확히 지정하기 위해 URI 형식이 사용된다. 클러스터 구조가 변경될 시(예: NameNode 주소 변경, 다른 파일 시스템으로 마이그레이션 등) 이 값을 수정하면 클러스터 전체 경로 해석 방식이 바뀐다.
-  - [scheme]://[authority]:port
   - hdfs://host:port/
 
 - hadoop.tmp.dir : Hadoop component가 사용하는 기본 임시 디렉터리. NameNode, DataNode, ResourceManager 등 여러 컴포넌트가 공통적으로 사용하는 기본 임시 저장소이다. 만약 dfs.namenode.name.dir이 설정되면 무시된다.
