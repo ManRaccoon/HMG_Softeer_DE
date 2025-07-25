@@ -1,4 +1,4 @@
-# W3M4 'predefined keywords' 외 다른 분류 방법
+# W3M2b 유용한 Configuration Files 세팅의 사용법 파악
 
 ## 1. core-site.xml
 모든 Hadoop 컴포넌트에서 공통으로 참조하는 기본 설정을 담당하는 파일이다.
