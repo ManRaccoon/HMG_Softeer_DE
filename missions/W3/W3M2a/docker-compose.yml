@@ -1,0 +1,68 @@
+version: '3.8'
+services:
+  namenode:
+    build:
+      context: .
+      args:
+        HADOOP_ROLE: master
+    container_name: namenode
+    hostname: namenode
+    environment:
+      HADOOP_ROLE: master
+      HDFS_NAMENODE_USER: hadoop
+      HDFS_SECONDARYNAMENODE_USER: hadoop
+      YARN_RESOURCEMANAGER_USER: hadoop
+    ports:
+      - "9870:9870" # HDFS NameNode Web UI
+      - "9000:9000" # HDFS NameNode IPC
+      - "8088:8088" # YARN ResourceManager Web UI
+    volumes:
+      - hadoop_namenode_data:/opt/hadoop-3.3.6/data/namenode
+    networks:
+      - hadoop_network
+    entrypoint: [ "bash", "-lc", "/entrypoint.sh ${HADOOP_ROLE}" ]
+
+  datanode1:
+    build:
+      context: .
+      args:
+        HADOOP_ROLE: worker
+    container_name: datanode1
+    hostname: datanode1
+    environment:
+      HADOOP_ROLE: worker
+      HDFS_DATANODE_USER: hadoop
+    depends_on:
+      - namenode
+    volumes:
+      - hadoop_datanode1_data:/opt/hadoop-3.3.6/data/datanode
+    networks:
+      - hadoop_network
+    entrypoint: [ "bash", "-lc", "/entrypoint.sh ${HADOOP_ROLE}" ]
+
+  datanode2:
+    build:
+      context: .
+      args:
+        HADOOP_ROLE: worker
+    container_name: datanode2
+    hostname: datanode2
+    environment:
+      HADOOP_ROLE: worker
+      HDFS_DATANODE_USER: hadoop
+    depends_on:
+      - namenode
+    volumes:
+      - hadoop_datanode2_data:/opt/hadoop-3.3.6/data/datanode
+    networks:
+      - hadoop_network
+    entrypoint: [ "bash", "-lc", "/entrypoint.sh ${HADOOP_ROLE}" ]
+
+networks:
+  hadoop_network:
+    driver: bridge
+
+volumes:
+  hadoop_namenode_data:
+  hadoop_datanode1_data:
+  hadoop_datanode2_data:

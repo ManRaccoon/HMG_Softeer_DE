@@ -1,0 +1,14 @@
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>2</value> <!-- Number of datanodes -->
+    </property>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:/opt/hadoop-3.3.6/data/namenode</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:/opt/hadoop-3.3.6/data/datanode</value>
+    </property>
+</configuration>
