@@ -10,7 +10,7 @@
         <value>8192</value>
     </property>
     <property>
-        <name>yarn.schedular.minimum-allocation-mb</name>
+        <name>yarn.scheduler.minimum-allocation-mb</name>
         <value>1024</value>
     </property>
 
