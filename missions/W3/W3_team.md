@@ -1,4 +1,6 @@
-# W3M2b 유용한 Configuration Files 세팅의 사용법 파악
+# W3 Team3 팀 활동 Wiki
+
+# W3M2b : 유용한 Configuration Files 세팅의 사용법 파악
 
 ## 1. core-site.xml
 모든 Hadoop 컴포넌트에서 공통으로 참조하는 기본 설정을 담당하는 파일이다.
@@ -91,11 +93,9 @@ MapReduce는 Map, Shuffle, Reduce의 3단계로 이루어져있으며, 각각에
 
 
 
-# W3M4 'predefined keywords' 외 다른 분류 방법
+# W3M4 : 'predefined keywords' 외 다른 분류 방법
 
 '미리 정의된 키워드' 방식은 간단하지만, 문맥이나 새로운 신조어를 이해하지 못하는 명확한 한계가 있습니다. 이를 극복하기 위한 더 정교한 방법들이 있으며, 크게 **전통적인 머신러닝**과 **딥러닝** 두 가지 방향으로 나눌 수 있습니다.
-
----
 
 ##  1. 전통적인 머신러닝 (Traditional Machine Learning)
 
