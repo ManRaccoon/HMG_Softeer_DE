@@ -1,4 +1,6 @@
-# 1. core-site.xml
+# W3M4 'predefined keywords' 외 다른 분류 방법
+
+## 1. core-site.xml
 모든 Hadoop 컴포넌트에서 공통으로 참조하는 기본 설정을 담당하는 파일이다.
 
 - fs.defaultFS : file system URI를 명시하는 파라미터. Hadoop은 여러 종류의 파일 시스템을 지원하기에, 어디서 데이터를 읽고 쓸 것인지 명확히 지정하기 위해 URI 형식이 사용된다. 클러스터 구조가 변경될 시(예: NameNode 주소 변경, 다른 파일 시스템으로 마이그레이션 등) 이 값을 수정하면 클러스터 전체 경로 해석 방식이 바뀐다.
@@ -11,10 +13,10 @@
   - default : 131072 Bytes = 128 KB
 
 
-# 2. hdfs-site.xml
+## 2. hdfs-site.xml
 HDFS의 핵심 설정을 담당하는 설정파일로, HDFS 저장소의 구조, 복제, 블록 크기, 네임노드/데이터노드 관련 설정을 담당한다.
 
-## (1) namenode 관련 설정
+### (1) namenode 관련 설정
 - dfs.namenode.name.dir : NameNode 메타데이터(파일 시스템 이미지와 로그 등)를 저장할 로컬 디렉토리 경로를 설정하는 파라미터. NameNode의 경로가 바뀌는 경우는 기존 저장 디스크의 용량이 부족하여 교체하는 등 다른 디스크에 저장하고 싶을 때 발생한다.
   
 - dfs.hosts / dfs.hosts.exclude: HDFS에서 DataNode 접근 제어를 위해 사용되는 설정. NameNode가 어떤 노드를 허용할지 또는 제외할지 지정. 즉, 여기에 명시된 호스트만 Datanode로 참여시키거나, 제외시킴.
@@ -28,14 +30,14 @@ HDFS의 핵심 설정을 담당하는 설정파일로, HDFS 저장소의 구조,
 - dfs.replication: replica의 수를 설정한다. replica의 수를 늘리면 유지보수성이 늘어난다. 예를 들어 특정 노드가 과부하되거나 유지보수로 내려가도, 다른 노드의 복제본을 활용할 수 있는 가능성이 높아진다.
     - default = 3 (하나의 HDFS 블록이 서로 다른 3개의 DataNode에 복제되어 저장)
   
-## (2) datanode 관련 설정
+### (2) datanode 관련 설정
 - dfs.datanode.data.dir : 파일 시스템이 꽉 차서 디스크 추가/마운트될 때 일반적으로 DataNode의 데이터 저장 경로 수정.
 
 
-# 3. map-red.xml
+## 3. map-red.xml
 MapReduce는 Map, Shuffle, Reduce의 3단계로 이루어져있으며, 각각에 대한 설정 파일이다.
 
-## (1) MapReduce 관련 설정
+### (1) MapReduce 관련 설정
 - mapreduce.framework.name: 실행하는 프레임워크를 yarn으로 설정한다.
   
 - mapreduce.map.memory.mb : 각 Map task가 실행될 컨테이너의 전체 메모리 크기(MB). 컨테이너에 할당할 총 메모리 (heap + non-heap 포함)를 의미.
@@ -52,7 +54,7 @@ MapReduce는 Map, Shuffle, Reduce의 3단계로 이루어져있으며, 각각에
 - mapreduce.reduce.shuffle.parallelcopies : 각 Reduce task가 동시에 Map task로부터 데이터를 받아올 수 있는 연결 수. 너무 작으면 shuffle 병목이 발생해서 매우 느려지고, 너무 크면 네트워크 부하가 걸릴 수 있다.
   - default: 5
 
-## (2) MapReduce JobHistory Server 관련 설정
+### (2) MapReduce JobHistory Server 관련 설정
 - mapreduce.jobhistory.address: Mapreduce 작업의 실행 이력을 조회할 수 있는 history server의 주소를 지정하는 파라미터. MapReduce 작업의 상태, 로그, 성능 지표를 조회할 때 연결한다.
   
 - mapreduce.jobhistory.webapp.address: JobHistory 서버의 웹 UI 주소 (호스트:포트) 를 지정.
@@ -64,19 +66,19 @@ MapReduce는 Map, Shuffle, Reduce의 3단계로 이루어져있으며, 각각에
 - mapreduce.jobhistory.done-dir: 완료된 MapReduce Job들의 로그 파일들을 영구 저장하는 디렉토리. JobHistory 서버는 이 디렉토리를 기준으로 웹 UI에서 작업 이력을 제공한다.
   - hdfs:///mr-history/done
 
-# 4. yarn-site.xml
-## (1) ResourceManager, NodeManager 공통 설정
+## 4. yarn-site.xml
+### (1) ResourceManager, NodeManager 공통 설정
 - yarn.acl.enable: YARN 리소스에 대한 접근 제어(사용자/그룹 기반 권한 설정)를 활성화할지 여부를 지정.
   - default: false
   
 - yarn.scheduler.minimum-allocation-mb: yarn에서 어떤 작업이 들어오면, AM에게 전달되어 NodeManager에게 컨테이너(자원)을 요청한다. 자원이 도착하면 각 컨테이너를 ResourceManager에게 전달하고, ResourceManager는 이 자원을 가지고 요청된 작업을 실행하도록 전달한다. 이때 각 컨테이너에 할당되어야 하는 최소 메모리를 지정하는 파라미터이다. 
 
-## (2) ResourceManager 관련 설정
+### (2) ResourceManager 관련 설정
 - yarn.resourcemanager.address: Yarn 클러스터에서 클라이언트가 ResourceManager에 접근할 때 사용하는 주소. (RPC: 여러 노드로 구성된 분산시스템에서 네트워크를 통해 다른 서버에 있는 메서드를 호출. 마치 로컬 함수처럼 사용하지만 내부적으로 네트워크 통신이 발생.)
 
 - yarn.nodemanager.resource.memory-mb: Yarn에서 해당 노드가 컨테이너 실행을 위해 사용할 수 있는 총 메모리의 용량을 설정하는 파라미터. 한 노드가 최대 얼마만큼의 메모리를 컨테이너들에게 나눠줄 수 있는지를 알려주는 설정.
 
-## (3) NodeManager 관련 설정
+### (3) NodeManager 관련 설정
 - yarn.nodemanager.resource.memory-mb: NodeManager가 사용할 수 있는 전체 메모리 용량을 MB 단위로 지정. YARN에서 실행되는 각 컨테이너는 이 메모리 범위 내에서 동작해야 함.
   - 반드시 mapreduce.map.memory.mb, mapreduce.reduce.memory.mb와 일관되게 설정되어야 함.
   
@@ -84,7 +86,11 @@ MapReduce는 Map, Shuffle, Reduce의 3단계로 이루어져있으며, 각각에
   - mapreduce_shuffle: MapReduce를 실행하기 위해 반드시 설정해야함.
 
 
+
+
 ---
+
+
 
 # W3M4 'predefined keywords' 외 다른 분류 방법
 
