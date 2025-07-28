@@ -1,4 +1,4 @@
-# W3M2a - Hadoop Multi-Node Cluster on Docker
+# W3M4 - Twitter Sentiment Analysis using MapReduce
 
 ## 1. Docker 이미지 빌드
 
@@ -36,6 +36,8 @@
 
 - config 디렉토리 안에 있는 모든 파일, entrypoint를 이미지에 옮긴다
 
+- **mapper.py, reducer.py, sent.csv**를 이미지에 옮겨 MapReduce를 진행하도록 한다.
+
 ### ENTRYPOINT
 
 - bash 실행 후 -lc 태그로 환경을 초기화하고 entrypoint.sh을 실행시키도록 한다.
@@ -49,12 +51,9 @@
 docker compose up -d
 ```
 
-hadoop-single이라는 이름으로 도커 이미지 빌드
+## 3. MapReduce 작업 수행
 
-
-## 3. HDFS 작업 수행
-
-Container 내부 명령어를 통해 MapReduce 연산이 가능하도록 하였다.
+Custom MapReduce 연산을 통해 입력한 tweet의 감정 분류가 가능하게 하였다.
 
 - namenode bash로 들어가기
 
@@ -62,44 +61,42 @@ Container 내부 명령어를 통해 MapReduce 연산이 가능하도록 하였�
 docker exec -u hdfs -it namenode /bin/bash
 ```
 
-- home 디렉토리로 이동
-
-```bash
-cd ~
-```
-
-- 예시 파일 작성
-
-```bash
-echo -e "Hello World\nWelcome to Hadoop\nHadoop MapReduce Example" > input.txt
-```
-
-- hdfs내에 /input 디렉토리 생성, 생성 확인
+- hdfs내에 /input 디렉토리 생성 및 csv 파일 넣기
 
 ```bash
 hdfs dfs -mkdir /input
 ```
 
 ```bash
-hdfs dfs -ls /input
+hdfs dfs -put /sent.csv /input/
 ```
+
+- Sentiment Count MapReduce 패키징 및 연산 진행
 
 ```bash
-hdfs dfs -cat /input/input.txt
+hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming*.jar \
+    -input /input/sent.csv \
+    -output /output/result \
+    -mapper "python3 mapper.py" \
+    -reducer "python3 reducer.py" \
+    -file mapper.py \
+    -file reducer.py
 ```
 
-- wordcount MapReduce 연산 진행
+- Sentiment Count 연산 결과 확인
 
 ```bash
-yarn jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar wordcount /input /output
+hdfs dfs -cat /output/result/part-*
 ```
 
-- MapReduce 연산 결과 확인
-
-```bash
-hdfs dfs -ls /output
-```
+결과 출력
 
 ```bash
-hdfs dfs -cat /output/part-r-00000
+negative: 66478
+neutral: 1354825
+positive: 178697
 ```
+
+1,600,000개 전부 나오는 것을 볼 수 있다. 하지만 데이터셋 라벨은 Positive 800,000개, Negative 800,000개이다.
+
+미리 정의된 단어들로 감정을 분류하는 것은 한계가 있다고 판단했다.

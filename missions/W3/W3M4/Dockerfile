@@ -27,7 +27,13 @@ RUN chown -R hdfs:hadoop $HADOOP_HOME && \
 
 COPY config/*.xml /usr/local/hadoop/etc/hadoop/
 
-# RUN echo "export JAVA_HOME=$JAVA_HOME" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+# input ebook, mapper, reducer for wordcount
+COPY mapper.py /mapper.py
+RUN chmod +x /mapper.py
+COPY reducer.py /reducer.py
+RUN chmod +x /reducer.py
+COPY sent.csv /sent.csv
+RUN chmod +x /sent.csv
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

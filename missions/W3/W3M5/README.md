@@ -1,4 +1,4 @@
-# W3M2a - Hadoop Multi-Node Cluster on Docker
+# W3M5 - Average Rating of Movies using MapReduce
 
 ## 1. Docker 이미지 빌드
 
@@ -36,6 +36,8 @@
 
 - config 디렉토리 안에 있는 모든 파일, entrypoint를 이미지에 옮긴다
 
+- **mapper.py, reducer.py, rating.csv**를 이미지에 옮겨 MapReduce를 진행하도록 한다.
+
 ### ENTRYPOINT
 
 - bash 실행 후 -lc 태그로 환경을 초기화하고 entrypoint.sh을 실행시키도록 한다.
@@ -49,12 +51,9 @@
 docker compose up -d
 ```
 
-hadoop-single이라는 이름으로 도커 이미지 빌드
+## 3. MapReduce 작업 수행
 
-
-## 3. HDFS 작업 수행
-
-Container 내부 명령어를 통해 MapReduce 연산이 가능하도록 하였다.
+Custom MapReduce 연산을 통해 입력한 영화 리뷰의 평균점수 출력이 가능하게 하였다.
 
 - namenode bash로 들어가기
 
@@ -62,44 +61,47 @@ Container 내부 명령어를 통해 MapReduce 연산이 가능하도록 하였�
 docker exec -u hdfs -it namenode /bin/bash
 ```
 
-- home 디렉토리로 이동
-
-```bash
-cd ~
-```
-
-- 예시 파일 작성
-
-```bash
-echo -e "Hello World\nWelcome to Hadoop\nHadoop MapReduce Example" > input.txt
-```
-
-- hdfs내에 /input 디렉토리 생성, 생성 확인
+- hdfs내에 /input 디렉토리 생성 및 csv 파일 넣기
 
 ```bash
 hdfs dfs -mkdir /input
 ```
 
 ```bash
-hdfs dfs -ls /input
+hdfs dfs -put /ratings.csv /input/
 ```
 
+- Average Rating MapReduce 패키징 및 연산 진행
+
 ```bash
-hdfs dfs -cat /input/input.txt
+hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming*.jar \
+    -input /input/ratings.csv \
+    -output /output/result \
+    -mapper "python3 mapper.py" \
+    -reducer "python3 reducer.py" \
+    -file mapper.py \
+    -file reducer.py
 ```
 
-- wordcount MapReduce 연산 진행
+- Average Rating 연산 결과 확인
+
+movieId기준 상위 10개만 확인하도록 설정
 
 ```bash
-yarn jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar wordcount /input /output
+hdfs dfs -cat /output/result/part-* | head -n 10
 ```
 
-- MapReduce 연산 결과 확인
+결과 출력
 
 ```bash
-hdfs dfs -ls /output
-```
-
-```bash
-hdfs dfs -cat /output/part-r-00000
+1       3.9
+2       3.2
+3       3.2
+4       2.9
+5       3.1
+6       3.8
+7       3.4
+8       3.1
+9       3.0
+10      3.4
 ```
