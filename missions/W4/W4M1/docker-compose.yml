@@ -1,0 +1,89 @@
+services:
+  namenode:
+    build:
+      context: .
+    container_name: namenode
+    hostname: namenode
+    ports:
+      - "9870:9870"
+    volumes:
+      - ./data/namenode:/usr/local/hadoop/tmp/dfs/name
+    environment:
+      HDFS_NAMENODE_USER: hdfs
+      HDFS_SECONDARYNAMENODE_USER: hdfs
+    user: hdfs
+    networks:
+      - hadoop-network
+
+  datanode1:
+    build:
+      context: .
+    container_name: datanode1
+    hostname: datanode1
+    volumes:
+      - ./data/datanode1:/usr/local/hadoop/tmp/dfs/data
+    environment:
+      HDFS_DATANODE_USER: hdfs
+    user: hdfs
+    depends_on:
+      - namenode
+    networks:
+      - hadoop-network
+
+  datanode2:
+    build:
+      context: .
+    container_name: datanode2
+    hostname: datanode2
+    volumes:
+      - ./data/datanode2:/usr/local/hadoop/tmp/dfs/data
+    environment:
+      HDFS_DATANODE_USER: hdfs
+    user: hdfs
+    depends_on:
+      - namenode
+    networks:
+      - hadoop-network
+
+  driver:
+    build:
+      context: .
+    container_name: driver
+    hostname: driver
+    ports:
+      - "8088:8088"
+    environment:
+      YARN_RESOURCEMANAGER_USER: yarn
+    user: yarn
+    networks:
+      - hadoop-network
+
+  worker1:
+    build:
+      context: .
+    container_name: worker1
+    hostname: worker1
+    environment:
+      YARN_NODEMANAGER_USER: yarn
+    user: yarn
+    depends_on:
+      - driver
+    networks:
+      - hadoop-network
+
+  worker2:
+    build:
+      context: .
+    container_name: worker2
+    hostname: worker2
+    environment:
+      YARN_NODEMANAGER_USER: yarn
+    user: yarn
+    depends_on:
+      - driver
+    networks:
+      - hadoop-network
+
+networks:
+  hadoop-network:
+    driver: bridge
