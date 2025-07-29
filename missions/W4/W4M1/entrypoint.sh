@@ -1,18 +1,20 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
+mkdir -p $HADOOP_HOME/logs $SPARK_HOME/logs
+# touch $HADOOP_HOME/logs/dummy.log
+# touch $SPARK_HOME/logs/dummy.log
+
 if [ "$HOSTNAME" == "namenode" ]; then
     if [ ! -f /usr/local/hadoop/tmp/dfs/name/current/VERSION ]; then
         $HADOOP_HOME/bin/hdfs namenode -format -force
     fi
-fi
-
-if [ "$HOSTNAME" == "namenode" ]; then
-    $HADOOP_HOME/bin/hdfs namenode
+    $HADOOP_HOME/bin/hdfs namenode &
 elif [[ "$HOSTNAME" == datanode* ]]; then
-    $HADOOP_HOME/bin/hdfs datanode
-elif [ "$HOSTNAME" == "driver" ]; then
-    $SPARK_HOME/sbin/start-master.sh
-elif [[ "$HOSTNAME" == worker* ]]; then
-    $SPARK_HOME/sbin/start-slave.sh spark://driver:7077
+    $HADOOP_HOME/bin/hdfs datanode &
+elif [ "$HOSTNAME" == "master" ]; then
+    $SPARK_HOME/sbin/start-master.sh &
+elif [[ "$HOSTNAME" == slave* ]]; then
+    $SPARK_HOME/sbin/start-worker.sh spark://master:7077 &
 fi
 
-tail -f /dev/null
+tail -F $HADOOP_HOME/logs/* $SPARK_HOME/logs/*

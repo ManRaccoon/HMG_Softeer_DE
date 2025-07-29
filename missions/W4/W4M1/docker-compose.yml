@@ -45,42 +45,41 @@ services:
     networks:
       - hadoop-network
 
-  driver:
+  master:
     build:
       context: .
-    container_name: driver
-    hostname: driver
+    container_name: master
+    hostname: master
     ports:
-      - "8088:8088"
-    environment:
-      YARN_RESOURCEMANAGER_USER: yarn
-    user: yarn
+      - "7077:7077"
+      - "8080:8080"
+    user: spark
     networks:
       - hadoop-network
 
-  worker1:
+  slave1:
     build:
       context: .
-    container_name: worker1
-    hostname: worker1
-    environment:
-      YARN_NODEMANAGER_USER: yarn
-    user: yarn
+    container_name: slave1
+    hostname: slave1
+    ports:
+      - "8081:8081"
+    user: spark
     depends_on:
-      - driver
+      - master
     networks:
       - hadoop-network
 
-  worker2:
+  slave2:
     build:
       context: .
-    container_name: worker2
-    hostname: worker2
-    environment:
-      YARN_NODEMANAGER_USER: yarn
-    user: yarn
+    container_name: slave2
+    hostname: slave2
+    ports:
+      - "8082:8081"
+    user: spark
     depends_on:
-      - driver
+      - master
     networks:
       - hadoop-network
 

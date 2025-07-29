@@ -21,19 +21,28 @@ RUN wget https://mirrors.sonic.net/apache/hadoop/common/hadoop-$HADOOP_VERSION/h
     rm hadoop-$HADOOP_VERSION.tar.gz
 
 RUN wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-without-hadoop.tgz && \
-    tar xvzf spark-${SPARK_VERSION}-bin-hadoop3.tgz && \
-    mv spark-${SPARK_VERSION}-bin-hadoop3 $SPARK_HOME && \
-    rm spark-${SPARK_VERSION}-bin-hadoop3.tgz
+    tar xvzf spark-${SPARK_VERSION}-bin-without-hadoop.tgz && \
+    mv spark-${SPARK_VERSION}-bin-without-hadoop $SPARK_HOME && \
+    rm spark-${SPARK_VERSION}-bin-without-hadoop.tgz
 
 
 RUN groupadd hadoop && \
-    useradd -ms /bin/bash -g hadoop hdfs && \
-    useradd -ms /bin/bash -g hadoop yarn
+    groupadd spark && \
+    useradd -ms /bin/bash -g spark hdfs && \
+    useradd -ms /bin/bash -g spark spark
 
-RUN chown -R hdfs:hadoop $HADOOP_HOME && \
-    chmod -R 775 $HADOOP_HOME
+RUN chown -R hdfs:spark $HADOOP_HOME && \
+    chmod -R 775 $HADOOP_HOME && \
+    chown -R spark:spark $SPARK_HOME && \
+    chmod -R 775 $SPARK_HOME
+
+COPY config/spark-env.sh /usr/local/spark/conf/spark-env.sh
+COPY config/slaves /usr/local/spark/conf/slaves
 
 COPY config/*.xml /usr/local/hadoop/etc/hadoop/
+
+COPY pi.py /pi.py
+RUN chmod +x /pi.py
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
