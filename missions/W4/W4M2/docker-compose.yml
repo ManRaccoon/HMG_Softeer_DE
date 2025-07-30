@@ -1,0 +1,88 @@
+services:
+  namenode:
+    build:
+      context: .
+    container_name: namenode
+    hostname: namenode
+    ports:
+      - "9870:9870"
+    volumes:
+      - ./data/namenode:/usr/local/hadoop/tmp/dfs/name
+    environment:
+      HDFS_NAMENODE_USER: hdfs
+      HDFS_SECONDARYNAMENODE_USER: hdfs
+    user: hdfs
+    networks:
+      - hadoop-network
+
+  datanode1:
+    build:
+      context: .
+    container_name: datanode1
+    hostname: datanode1
+    volumes:
+      - ./data/datanode1:/usr/local/hadoop/tmp/dfs/data
+    environment:
+      HDFS_DATANODE_USER: hdfs
+    user: hdfs
+    depends_on:
+      - namenode
+    networks:
+      - hadoop-network
+
+  datanode2:
+    build:
+      context: .
+    container_name: datanode2
+    hostname: datanode2
+    volumes:
+      - ./data/datanode2:/usr/local/hadoop/tmp/dfs/data
+    environment:
+      HDFS_DATANODE_USER: hdfs
+    user: hdfs
+    depends_on:
+      - namenode
+    networks:
+      - hadoop-network
+
+  master:
+    build:
+      context: .
+    container_name: master
+    hostname: master
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    user: spark
+    networks:
+      - hadoop-network
+
+  slave1:
+    build:
+      context: .
+    container_name: slave1
+    hostname: slave1
+    ports:
+      - "8081:8081"
+    user: spark
+    depends_on:
+      - master
+    networks:
+      - hadoop-network
+
+  slave2:
+    build:
+      context: .
+    container_name: slave2
+    hostname: slave2
+    ports:
+      - "8082:8081"
+    user: spark
+    depends_on:
+      - master
+    networks:
+      - hadoop-network
+
+networks:
+  hadoop-network:
+    driver: bridge
