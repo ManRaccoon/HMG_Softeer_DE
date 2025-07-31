@@ -1,4 +1,4 @@
-# W3M3 - Word Count using MapReduce
+# W4M1 - Building Apache Spark Standalone Cluster on Docker
 
 ## Spark pi.py 작업 실행
 

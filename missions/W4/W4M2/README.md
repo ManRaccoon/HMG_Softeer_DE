@@ -1,40 +1,11 @@
-# W3M3 - Word Count using MapReduce
+# W4M2 - NYC TLC Trip Record Analysis using Apache Spark
 
-## Spark pi.py 작업 실행
-
-- docker bash로 들어가기
+- docker compose 빌드
 
 ```bash
-docker exec -u hdfs -it namenode /bin/bash
+docker compose up --scale spark-worker=3 -d
 ```
 
-- hdfs내에 /output 디렉토리 생성
+- docker desktop 컨테이너 로그(8888포트) 클릭
 
-```bash
-hdfs dfs -mkdir /output
-```
-
-- pi.py실행 및 결과 저장
-
-```bash
-spark-submit \
---master spark://master:7077 \
---deploy-mode client \
-/pi.py \
-1000 \
-hdfs://namenode:9000/output/pi
-```
-
-- WordCount 연산 결과 확인
-
-내림차순으로 상위 10개만 출력하도록 하였다.
-
-```bash
-hdfs dfs -cat /output/pi/part-*
-```
-
-결과 출력 예시
-
-```bash
-3.14532
-```
+- W4M2.ipynb 실행

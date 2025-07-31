@@ -1,88 +1,54 @@
 services:
-  namenode:
-    build:
-      context: .
-    container_name: namenode
-    hostname: namenode
-    ports:
-      - "9870:9870"
-    volumes:
-      - ./data/namenode:/usr/local/hadoop/tmp/dfs/name
-    environment:
-      HDFS_NAMENODE_USER: hdfs
-      HDFS_SECONDARYNAMENODE_USER: hdfs
-    user: hdfs
-    networks:
-      - hadoop-network
-
-  datanode1:
-    build:
-      context: .
-    container_name: datanode1
-    hostname: datanode1
-    volumes:
-      - ./data/datanode1:/usr/local/hadoop/tmp/dfs/data
-    environment:
-      HDFS_DATANODE_USER: hdfs
-    user: hdfs
-    depends_on:
-      - namenode
-    networks:
-      - hadoop-network
-
-  datanode2:
-    build:
-      context: .
-    container_name: datanode2
-    hostname: datanode2
-    volumes:
-      - ./data/datanode2:/usr/local/hadoop/tmp/dfs/data
-    environment:
-      HDFS_DATANODE_USER: hdfs
-    user: hdfs
-    depends_on:
-      - namenode
-    networks:
-      - hadoop-network
-
-  master:
-    build:
-      context: .
-    container_name: master
-    hostname: master
+  spark-master:
+    image: jupyter/pyspark-notebook:latest
+    container_name: spark-master
+    command: >
+      start.sh bash -c "/opt/spark/sbin/start-master.sh && tail -f /dev/null"
     ports:
       - "7077:7077"
       - "8080:8080"
-    user: spark
+    environment:
+      - SPARK_MASTER_HOST=spark-master
     networks:
-      - hadoop-network
+      - spark-network
+    volumes:
+      - ./data:/home/jovyan/data
+      - ./notebooks:/home/jovyan/work
 
-  slave1:
-    build:
-      context: .
-    container_name: slave1
-    hostname: slave1
-    ports:
-      - "8081:8081"
-    user: spark
+  spark-worker:
+    image: jupyter/pyspark-notebook:latest
     depends_on:
-      - master
+      - spark-master
+    command: >
+      bash -c "/opt/spark/sbin/start-worker.sh spark://spark-master:7077 && tail -f /dev/null"
+    environment:
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+    ports: []
     networks:
-      - hadoop-network
+      - spark-network
+    volumes:
+      - ./data:/home/jovyan/data
+      - ./notebooks:/home/jovyan/work
 
-  slave2:
-    build:
-      context: .
-    container_name: slave2
-    hostname: slave2
-    ports:
-      - "8082:8081"
-    user: spark
+  jupyter:
+    image: jupyter/pyspark-notebook:latest
     depends_on:
-      - master
+      - spark-master
+    ports:
+      - "8888:8888" # Jupyter Notebook 접속 포트
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN= # 빈 값이면 토큰 없이 접속 (보안 유의)
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./dataset:/home/jovyan/dataset
+      - ./weather.csv:/home/jovyan/weather.csv
+      - ./W4M2.ipynb:/home/jovyan/W4M2.ipynb
     networks:
-      - hadoop-network
+      - spark-network
 
 networks:
-  hadoop-network:
+  spark-network:
     driver: bridge
