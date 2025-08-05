@@ -1,0 +1,92 @@
+services:
+  spark-master:
+    image: bitnami/spark:3.5-debian-12
+    container_name: spark-master
+    command: [ "spark-class", "org.apache.spark.deploy.master.Master" ]
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    environment:
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MODE=master
+    networks:
+      - spark-network
+    volumes:
+      - ./data:/home/jovyan/data
+      - ./notebooks:/home/jovyan/work
+
+  spark-worker:
+    image: bitnami/spark:3.5-debian-12
+    depends_on:
+      - spark-master
+    command: [ "spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077" ]
+    environment:
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    ports:
+      - "8081:8081"
+    networks:
+      - spark-network
+    volumes:
+      - ./data:/home/jovyan/data
+      - ./notebooks:/home/jovyan/work
+
+  spark-worker-2:
+    image: bitnami/spark:3.5-debian-12
+    depends_on:
+      - spark-master
+    command: [ "spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077" ]
+    environment:
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    ports:
+      - "8082:8081"
+    networks:
+      - spark-network
+    volumes:
+      - ./data:/home/jovyan/data
+      - ./notebooks:/home/jovyan/work
+
+  spark-worker-3:
+    image: bitnami/spark:3.5-debian-12
+    depends_on:
+      - spark-master
+    command: [ "spark-class", "org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077" ]
+    environment:
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    ports:
+      - "8083:8081"
+    networks:
+      - spark-network
+    volumes:
+      - ./data:/home/jovyan/data
+      - ./notebooks:/home/jovyan/work
+
+  jupyter:
+    image: jupyter/pyspark-notebook:aarch64-spark-3.5.0
+    depends_on:
+      - spark-master
+    command: >
+      start-notebook.sh --NotebookApp.token='' --NotebookApp.password='' --allow-root
+    ports:
+      - "8888:8888" # Jupyter Notebook 접속 포트
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./dataset:/home/jovyan/dataset
+      - ./W5M1.ipynb:/home/jovyan/W5M1.ipynb
+    networks:
+      - spark-network
+
+networks:
+  spark-network:
+    driver: bridge
