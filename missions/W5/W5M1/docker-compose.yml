@@ -70,20 +70,19 @@ services:
       - ./notebooks:/home/jovyan/work
 
   jupyter:
-    image: jupyter/pyspark-notebook:aarch64-spark-3.5.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jupyter
     depends_on:
       - spark-master
-    command: >
-      start-notebook.sh --NotebookApp.token='' --NotebookApp.password='' --allow-root
     ports:
       - "8888:8888" # Jupyter Notebook 접속 포트
-    environment:
-      - JUPYTER_ENABLE_LAB=yes
     volumes:
-      - ./notebooks:/home/jovyan/work
-      - ./data:/home/jovyan/data
-      - ./dataset:/home/jovyan/dataset
-      - ./W5M1.ipynb:/home/jovyan/W5M1.ipynb
+      - ./notebooks:/opt/bitnami/notebooks
+      - ./data:/opt/bitnami/data
+      - ./dataset:/opt/bitnami/dataset
+      - ./W5M1.ipynb:/opt/bitnami/W5M1.ipynb
     networks:
       - spark-network
 
